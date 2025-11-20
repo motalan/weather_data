@@ -9,23 +9,30 @@ import os
 load_dotenv()
 
 class ColetorClima:
-    def __init__(self) -> None: #Declaração das variaveis de latitude e longitude e chave da API da OpenWeather
-        self.api_key = os.getenv('api_key')
-        self.lat = [-12.97, -19.81, -8.05, -25.42, -22.9, -30.03, -27.59, -23.66, -23.54]
-        self.lon = [-38.51, -43.95, -34.88, -49.27, -43.2, -51.23, -48.54, -46.46, -46.63]
+    def __init__(self, api_key: str, latitudes: list, longitudes: list) -> None: #Declaração das variaveis de latitude e longitude e chave da API da OpenWeather
+        self.api_key = api_key
+        self.coordenadas = list(zip(latitudes, longitudes))
         self.data_requisicao = date.today()
+        self.base_url = 'https://api.openweathermap.org/data/2.5/weather'
 
-    def requisitar(self, latitude, longitude): 
+    def requisitar(self, latitude, longitude) -> dict: #Metodo que faz a requisicao na API da OpenWeather e retorna um json com a resposta 
         
-        resposta = requests.get(f'https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&appid={self.api_key}&units=metric')
+        parametros = {
+                    'lat': latitude,
+                    'lon': longitude,
+                    'appid': self.api_key,
+                    'units': 'metric'
+        }
+
+        resposta = requests.get(self.base_url, params = parametros)
         return resposta.json()
     
-    def dados_dia(self) -> list:
-        self.lista_dicionarios = []
-        self.dia = f'{self.data_requisicao.day}.{self.data_requisicao.month}.{self.data_requisicao.year}'
+    def coletar_dados_dia(self) -> list[dict]:
+        self.dados_coletados = []
+        self.dia = self.data_requisicao.strftime('%d.%m.%Y')
         
-        for coord in range(len(self.lat)):
-            info = self.requisitar(self.lat[coord],self.lon[coord])
+        for lat, lon in self.coordenadas:
+            info = self.requisitar(lat, lon)
             dados = {'Data': self.dia,
                     'Lon': info['coord']['lon'],
                     'Lat': info['coord']['lat'],
@@ -38,16 +45,24 @@ class ColetorClima:
                     'City': info['name'],
                     'Country': info['sys']['country'],
                     }
-            self.lista_dicionarios.append(dados)
-        return self.lista_dicionarios
+            self.dados_coletados.append(dados)
+        return self.dados_coletados
         
     def salvar_dados(self) -> None:
-        self.path = Path(f'data/{self.data_requisicao.day}.{self.data_requisicao.month}.{self.data_requisicao.year}.csv')
-        self.destiny = self.path.parent
-        self.destiny.mkdir(parents=True, exist_ok=True)
-        self.df = pd.DataFrame(self.dados_dia())
-        self.df.to_csv(self.path,index=False)
+        #Nome do arquivo que será salvo
+        arquivo = (f'{self.data_requisicao.strftime("%d.%m.%Y")}.csv')
+        #Pasta onde o arquivo será salvo
+        pasta = Path('data') / arquivo
+        #Cria a pasta data caso ela não exista
+        pasta.parent.mkdir(parents=True, exist_ok=True)
+        #Cria o DataFrame e salva como csv
+        df = pd.DataFrame(self.coletar_dados_dia())
+        df.to_csv(pasta,index=False)
+        print(f'Dados salvos com sucesso em: {pasta}')
 
 if __name__ == '__main__':
-    bora = ColetorClima()
+    api_key = os.getenv('api_key')
+    latitudes = [-12.97, -19.81, -8.05, -25.42, -22.9, -30.03, -27.59, -23.66, -23.54]
+    longitudes = [-38.51, -43.95, -34.88, -49.27, -43.2, -51.23, -48.54, -46.46, -46.63]
+    bora = ColetorClima(api_key=api_key,latitudes=latitudes,longitudes=longitudes)
     bora.salvar_dados()
