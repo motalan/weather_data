@@ -9,7 +9,7 @@ import os
 load_dotenv()
 
 class ColetorClima:
-    def __init__(self) -> None: #Declaração das variaveis de latitude e longitude
+    def __init__(self) -> None: #Declaração das variaveis de latitude e longitude e chave da API da OpenWeather
         self.api_key = os.getenv('api_key')
         self.lat = [-12.97, -19.81, -8.05, -25.42, -22.9, -30.03, -27.59, -23.66, -23.54]
         self.lon = [-38.51, -43.95, -34.88, -49.27, -43.2, -51.23, -48.54, -46.46, -46.63]
