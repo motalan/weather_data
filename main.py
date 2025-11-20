@@ -6,8 +6,6 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
-
 class ColetorClima:
     def __init__(self, api_key: str, latitudes: list, longitudes: list) -> None: #Declaração das variaveis de latitude e longitude e chave da API da OpenWeather
         self.api_key = api_key
@@ -61,6 +59,7 @@ class ColetorClima:
         print(f'Dados salvos com sucesso em: {pasta}')
 
 if __name__ == '__main__':
+    load_dotenv()
     api_key = os.getenv('api_key')
     latitudes = [-12.97, -19.81, -8.05, -25.42, -22.9, -30.03, -27.59, -23.66, -23.54]
     longitudes = [-38.51, -43.95, -34.88, -49.27, -43.2, -51.23, -48.54, -46.46, -46.63]
