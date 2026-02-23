@@ -93,7 +93,7 @@ def data_transformation(path_name: str) -> pd.DataFrame:
     print('Iniciando transformações...')
     df = create_dataframe(path_name)
     df = normalize_weather_columns(df)
-    df = drop_columns(df)
+    df = drop_columns(df, columns_drop)
     df = rename_columns(df, columns_rename)
     df = normalize_datetime_columns(df, normalize_datetime)
     logging.info('Transformações concluidas.')
