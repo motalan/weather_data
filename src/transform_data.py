@@ -1,8 +1,41 @@
 import pandas as pd
-import Path
+from pathlib import Path
 import logging
+import pandera as pa
+from pandera.typing import Series
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+class SchemaWeather(pa.DataFrameModel):
+    base: str
+    visibility: int
+    datetime: Series[pd.DatetimeTZDtype]
+    timezone: int
+    city_id: int
+    citi_name: str
+    code: int
+    longitute: float
+    latitude: float
+    temperature: float
+    feels_like: float
+    temp_min: float
+    temp_max: float
+    pressure: int
+    humidity: int
+    sea_level: int
+    grnd_level: int
+    wind_speed: float
+    wind_deg: int
+    wind_gust: float = pa.Field(nullable=True)
+    clouds: int
+    sys_id: int = pa.Field(coerce=True, nullable=True)
+    country: str
+    sunrise: Series[pd.DatetimeTZDtype]
+    sunset: Series[pd.DatetimeTZDtype]
+    rain_1h: float = pa.Field(nullable=True)
+    weather_id: int
+    weather_main: str
+    weather_description: str
 
 columns_drop = ['weather', 'weather_icon', 'sys.type']
 columns_rename = {
@@ -19,7 +52,7 @@ columns_rename = {
     'main.pressure': 'pressure',
     'main.humidity': 'humidity',
     'main.sea_level': 'sea_level',
-    'main.grnd_level': 'sea_level',
+    'main.grnd_level': 'grnd_level',
     'wind.speed': 'wind_speed',
     'wind.deg': 'wind_deg',
     'wind.gust': 'wind_gust',
@@ -28,7 +61,8 @@ columns_rename = {
     'sys.id': 'sys_id',
     'sys.country': 'country',
     'sys.sunrise': 'sunrise',
-    'sys.sunset': 'sunset'
+    'sys.sunset': 'sunset',
+    'rain1.h': 'rain_1h'
 }
 normalize_datetime = ['datetime', 'sunrise', 'sunset']
 
@@ -57,7 +91,7 @@ def normalize_weather_columns(df: pd.DataFrame) -> pd.DataFrame:
 
     df = pd.concat([df,df_weather], axis=1)
 
-    logging.info(f'Coluna weather normalizada - DataFrame com {len(df)} colunas')
+    logging.info(f'Coluna weather normalizada - DataFrame com {len(df.columns)} colunas')
 
     return df
 
@@ -65,7 +99,7 @@ def normalize_weather_columns(df: pd.DataFrame) -> pd.DataFrame:
 def drop_columns(df: pd.DataFrame, columns_name: list[str]) -> pd.DataFrame:
     logging.info(f'Removend colunas: {columns_name}')
     df = df.drop(columns=columns_name)
-    logging.info(f'Colunas removidas - {len(df)} colunas restantes')
+    logging.info(f'Colunas removidas - {len(df.columns)} colunas restantes')
 
     return df
 
@@ -88,6 +122,16 @@ def normalize_datetime_columns(df: pd.DataFrame, columns_name:list[str]) -> pd.D
 
     return df
 
+# Adicionando um identificador p/ cada linha usando city_id e datetime
+def idempotence(df: pd.DataFrame) -> pd.DataFrame:
+    
+    logging.info(f'Iniciando o processo de criacao de IDs para {len(df)} linhas')
+    df['id_row'] = df['city_id'].astype(str) + '_' + df['datetime'].dt.strftime('%d%m%Y%H')
+
+    logging.info('Inclusao de IDs para linhas concluidas')
+
+    return df
+
 # Executando todas as transformações criadas acima
 def data_transformation(path_name: str) -> pd.DataFrame:
     print('Iniciando transformações...')
@@ -96,5 +140,7 @@ def data_transformation(path_name: str) -> pd.DataFrame:
     df = drop_columns(df, columns_drop)
     df = rename_columns(df, columns_rename)
     df = normalize_datetime_columns(df, normalize_datetime)
+    df = SchemaWeather.validate(df)
+    df = idempotence(df)
     logging.info('Transformações concluidas.')
     return df
