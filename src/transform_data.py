@@ -9,12 +9,12 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 class SchemaWeather(pa.DataFrameModel):
     base: str
     visibility: int
-    datetime: Series[pd.DatetimeTZDtype]
+    datetime: Series[pd.DatetimeTZDtype] = pa.Field(dtype_kwargs={'tz':'America/Sao_Paulo'})
     timezone: int
     city_id: int
-    citi_name: str
+    city_name: str
     code: int
-    longitute: float
+    longitude: float
     latitude: float
     temperature: float
     feels_like: float
@@ -28,10 +28,10 @@ class SchemaWeather(pa.DataFrameModel):
     wind_deg: int
     wind_gust: float = pa.Field(nullable=True)
     clouds: int
-    sys_id: int = pa.Field(coerce=True, nullable=True)
+    sys_id: float = pa.Field(nullable=True)
     country: str
-    sunrise: Series[pd.DatetimeTZDtype]
-    sunset: Series[pd.DatetimeTZDtype]
+    sunrise: Series[pd.DatetimeTZDtype] = pa.Field(dtype_kwargs={'tz':'America/Sao_Paulo'})
+    sunset: Series[pd.DatetimeTZDtype] = pa.Field(dtype_kwargs={'tz':'America/Sao_Paulo'})
     rain_1h: float = pa.Field(nullable=True)
     weather_id: int
     weather_main: str
@@ -62,7 +62,7 @@ columns_rename = {
     'sys.country': 'country',
     'sys.sunrise': 'sunrise',
     'sys.sunset': 'sunset',
-    'rain1.h': 'rain_1h'
+    'rain.1h': 'rain_1h'
 }
 normalize_datetime = ['datetime', 'sunrise', 'sunset']
 
