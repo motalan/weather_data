@@ -114,7 +114,7 @@ api_key=sua_chave_da_openweathermap_aqui
 ### Executar o Pipeline Completo
 
 ```bash
-python new_main.py
+python main.py
 ```
 
 Este comando executa:
@@ -135,7 +135,7 @@ O pipeline gera logs detalhados:
 
 ### Customizar Coordenadas
 
-Edite `new_main.py` para adicionar/remover cidades:
+Edite `main.py` para adicionar/remover cidades:
 
 ```python
 lats = [-12.97, -19.81, -8.05, ...]  # Latitudes
@@ -146,8 +146,7 @@ longs = [-38.51, -43.95, -34.88, ...]  # Longitudes
 
 ```
 git_weather/
-├── new_main.py              # Pipeline principal (RECOMENDADO)
-├── main.py                  # Script anterior
+├── main.py                  # Pipeline principal
 ├── teste.py                 # Testes
 ├── pyproject.toml           # Dependências e metadados
 ├── .env                     # Variáveis de ambiente (não versionado)
@@ -193,20 +192,8 @@ Este projeto é de código aberto. Sinta-se livre para usar e modificar.
 
 ## 👥 Autor
 
-Desenvolvido por [Alan Mota]
+Desenvolvido por [Alan Mota](https://www.linkedin.com/in/motalan/)
 
 ## 📧 Contato & Suporte
 
-Para dúvidas ou problemas, abra uma [issue](https://github.com/seu-usuario/git_weather/issues) no repositório.
-
-## ▶️ Como usar
-
-1. Abra o arquivo do script (ex: `main.py`).
-2. No bloco `if__name__ == '__main__':`, você pode editar as listas `latitude` e `longitude` com as coordenadas das cidades que deseja monitorar.
-3. Execute o script:
-   ```Bash
-       python main.py
-
-**Saída Esperada**
-O script criará uma pasta `data/` e salvará um arquivo CSV com a data de hoje.
-
+Para dúvidas ou problemas, abra uma issue no repositório.
