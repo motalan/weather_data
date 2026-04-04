@@ -15,11 +15,12 @@ def salvar_dados(df: pd.DataFrame):
     # Criando a coluna do dia da execução para partição
     data_hoje = datetime.now().strftime('%Y-%m-%d')
     df['today'] = data_hoje
+    df['lat_lon'] = df['latitude'].astype(str) + '_' + df['longitude']. astype(str)
 
     # Convertendo o DataFrame p/ tabela do pyarrow
     arrow = pa.Table.from_pandas(df)
 
     # Salvando os dados particionados
-    pq.write_to_dataset(arrow,root_path=diretorio,partition_cols=['today','city_id'])
+    pq.write_to_dataset(arrow,root_path=diretorio,partition_cols=['today','lat_lon'])
 
     logging.info(f'Dados salvos com sucesso nas partições do dia {data_hoje}')
