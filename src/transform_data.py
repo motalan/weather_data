@@ -28,11 +28,10 @@ class SchemaWeather(pa.DataFrameModel):
     wind_deg: int
     wind_gust: float = pa.Field(nullable=True)
     clouds: int
-    sys_id: float = pa.Field(nullable=True)
+    sys_id: int = pa.Field(nullable=True)
     country: str
     sunrise: Series[pd.DatetimeTZDtype] = pa.Field(dtype_kwargs={'tz':'America/Sao_Paulo'})
     sunset: Series[pd.DatetimeTZDtype] = pa.Field(dtype_kwargs={'tz':'America/Sao_Paulo'})
-    rain_1h: float = pa.Field(nullable=True)
     weather_id: int
     weather_main: str
     weather_description: str
@@ -61,8 +60,7 @@ columns_rename = {
     'sys.id': 'sys_id',
     'sys.country': 'country',
     'sys.sunrise': 'sunrise',
-    'sys.sunset': 'sunset',
-    'rain.1h': 'rain_1h'
+    'sys.sunset': 'sunset'
 }
 normalize_datetime = ['datetime', 'sunrise', 'sunset']
 
@@ -116,7 +114,7 @@ def normalize_datetime_columns(df: pd.DataFrame, columns_name:list[str]) -> pd.D
     logging.info(f'Convertendo colunas para datetime: {columns_name}')
 
     for name in columns_name:
-        df[name] = pd.to_datetime(df[name],unit='s', utc=True).dt.tz_convert('America/Sao_Paulo')
+        df[name] = pd.to_datetime(df[name],unit='ns', utc=True).dt.tz_convert('America/Sao_Paulo')
 
     logging.info('Colunas convertidas para datetime')
 
