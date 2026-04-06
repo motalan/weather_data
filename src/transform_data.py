@@ -28,15 +28,15 @@ class SchemaWeather(pa.DataFrameModel):
     wind_deg: int
     wind_gust: float = pa.Field(nullable=True)
     clouds: int
-    sys_id: int = pa.Field(nullable=True)
     country: str
     sunrise: Series[pd.DatetimeTZDtype] = pa.Field(dtype_kwargs={'tz':'America/Sao_Paulo'})
     sunset: Series[pd.DatetimeTZDtype] = pa.Field(dtype_kwargs={'tz':'America/Sao_Paulo'})
     weather_id: int
     weather_main: str
     weather_description: str
+    id_row: str
 
-columns_drop = ['weather', 'weather_icon', 'sys.type']
+columns_drop = ['weather', 'weather_icon', 'sys.type','sys.id']
 columns_rename = {
     'dt': 'datetime',
     'id': 'city_id',
@@ -63,6 +63,7 @@ columns_rename = {
     'sys.sunset': 'sunset'
 }
 normalize_datetime = ['datetime', 'sunrise', 'sunset']
+columns_round = ['latitude','longitude']
 
 # Criando o DataFrame
 def create_dataframe(path_name: str) -> pd.DataFrame:
@@ -130,6 +131,18 @@ def idempotence(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
+# Método para arredondar as colunas do tipo float para 2 casas decimais
+def round_float(df: pd.DataFrame, arredondar: list[str]) -> pd.DataFrame:
+
+    logging.info(f'Iniciando o processo de arredondamento das colunas do tipo float')
+
+    for i in arredondar:
+        df[i] = df[i].round(2)
+
+    logging.info(f'Processo concluido! {len(arredondar)} colunas alteradas')
+    
+    return df
+
 # Executando todas as transformações criadas acima
 def data_transformation(path_name: str) -> pd.DataFrame:
     print('Iniciando transformações...')
@@ -138,7 +151,8 @@ def data_transformation(path_name: str) -> pd.DataFrame:
     df = drop_columns(df, columns_drop)
     df = rename_columns(df, columns_rename)
     df = normalize_datetime_columns(df, normalize_datetime)
-    df = SchemaWeather.validate(df)
+    df = round_float(df, columns_round)
     df = idempotence(df)
+    df = SchemaWeather.validate(df)
     logging.info('Transformações concluidas.')
     return df
