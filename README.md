@@ -23,7 +23,7 @@ Este projeto implementa um **pipeline robusto e escalável** para monitorar dado
 
 ## 🚀 Funcionalidades
 
-- ✅ **Coleta em Lote:** Consulta múltiplas coordenadas (latitude/longitude) de forma automatizada
+- ✅ **Coleta em Lote:** Consulta 11 coordenadas (latitude/longitude) de forma automatizada
 - ✅ **Validação de Dados:** Schema validation com Pandera para garantir qualidade
 - ✅ **Armazenamento Otimizado:** Dados salvos em Parquet com particionamento por data e city_id
 - ✅ **Logging Detalhado:** Rastreamento completo do pipeline com timestamps
@@ -118,19 +118,19 @@ python main.py
 ```
 
 Este comando executa:
-1. **Extract:** Coleta dados climáticos das 9 cidades configuradas
+1. **Extract:** Coleta dados climáticos das 11 coordenadas configuradas
 2. **Transform:** Valida e transforma os dados
-3. **Load:** Salva em `data/currated/today=YYYY-MM-DD/city_id=XXX/`
+3. **Load:** Salva em `data/currated/today=YYYY-MM-DD/lat_lon=XX_YY/`
 
 ### Monitorar a Execução
 
 O pipeline gera logs detalhados:
 ```
-2026-02-23 14:30:15,123 - INFO - Pipeline iniciado as 23/02/2026-1430
-2026-02-23 14:30:15,456 - INFO - 1º - Iniciando a coleta dos dados
-2026-02-23 14:30:16,789 - INFO - Dados Coletados das seguintes coordenadas - Lat:-12.97 | Lon:-38.51
+2026-04-05 14:30:15,123 - INFO - Pipeline iniciado as 05/04/2026-1430
+2026-04-05 14:30:15,456 - INFO - 1º - Iniciando a coleta dos dados
+2026-04-05 14:30:16,789 - INFO - Dados Coletados das seguintes coordenadas - Lat:-12.97 | Lon:-38.51
 ...
-2026-02-23 14:30:25,123 - INFO - Pipeline finalizado as 23/02/2026-1430
+2026-04-05 14:30:25,123 - INFO - Pipeline finalizado as 05/04/2026-1430
 ```
 
 ### Customizar Coordenadas
@@ -159,13 +159,13 @@ git_weather/
 │
 └── data/
     ├── raw/                 # Dados brutos em JSON (entrada)
-    │   └── 23022026.json    # Exemplo: dados do dia 23/02/2026
+    │   └── 05042026.json    # Exemplo: dados do dia 05/04/2026
     │
     └── currated/            # Dados processados em Parquet (saída particionada)
-        └── today=2026-02-23/
-            ├── city_id=3390760/  # São Gonçalo
-            ├── city_id=3445334/  # Rio de Janeiro
-            └── ... (outras cidades)
+        └── today=2026-04-05/
+            ├── lat_lon=-12.97_-38.51/
+            ├── lat_lon=-19.81_-43.95/
+            └── ... (outras coordenadas)
 ```
 
 ## 🔍 Descrição dos Módulos
@@ -183,7 +183,7 @@ git_weather/
 
 ### `src/load_data.py`
 - Converte DataFrame para PyArrow Table
-- Particiona dados por `today` (data da coleta) e `city_id`
+- Particiona dados por `today` (data da coleta em YYYY-MM-DD) e `lat_lon` (latitude_longitude)
 - Salva em formato Parquet otimizado
 
 ## 📝 Licença
