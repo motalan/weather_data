@@ -36,7 +36,7 @@ class SchemaWeather(pa.DataFrameModel):
     weather_description: str
     id_row: str
 
-columns_drop = ['weather', 'weather_icon', 'sys.type','sys.id']
+columns_drop = ['weather', 'weather_icon']
 columns_rename = {
     'dt': 'datetime',
     'id': 'city_id',
